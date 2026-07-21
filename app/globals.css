@@ -1,26 +1,340 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #05080b;
+  --blue: #8fd9fb;
+  --blue-dim: #2f566b;
+  --ink: #dce8f1;
+  --ink-bright: #eef6fb;
+  --muted: #77899a;
+  --line: rgba(143, 217, 251, 0.14);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-blue: var(--blue);
+  --color-blue-dim: var(--blue-dim);
+  --color-ink: var(--ink);
+  --color-ink-bright: var(--ink-bright);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Mono", Consolas,
+    monospace;
+  --font-sans: var(--font-jetbrains), ui-monospace, "Cascadia Mono", Consolas,
+    monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-jetbrains), ui-monospace, "Cascadia Mono", Consolas,
+      monospace;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(143, 217, 251, 0.25);
+    color: var(--ink-bright);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+  }
+
+  /* mono at display size needs weight and negative tracking, or it looks spindly
+     and gappy. mono at body size needs a looser line-height and a shorter measure
+     than a sans would. these numbers are the whole reason all-mono can work here. */
+  h1 {
+    font-size: clamp(38px, 7.4vw, 116px);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    margin-bottom: 24px;
+    color: var(--ink-bright);
+    text-shadow: 0 0 60px rgba(143, 217, 251, 0.22);
+  }
+
+  h2 {
+    font-size: clamp(26px, 4.2vw, 58px);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    margin-bottom: 22px;
+    color: #e6f2f9;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .canvas-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* atmosphere. deliberately restrained: no flicker, no chromatic aberration. */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.5;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.16) 3px,
+      rgba(0, 0, 0, 0.16) 4px
+    );
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: radial-gradient(
+      108% 80% at 50% 46%,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 0.82) 100%
+    );
+  }
+
+  .content {
+    position: relative;
+    z-index: 6;
+  }
+
+  /* fixed chrome: instrumentation, not decoration */
+  .boot {
+    position: fixed;
+    left: 24px;
+    top: 22px;
+    z-index: 7;
+    font-size: 10px;
+    line-height: 1.8;
+    color: var(--blue);
+    opacity: 0.45;
+    letter-spacing: 0.03em;
+    pointer-events: none;
+    transition: opacity 1.2s ease 0.6s;
+  }
+
+  .boot-dim {
+    opacity: 0.18;
+  }
+
+  .hud {
+    position: fixed;
+    right: 24px;
+    bottom: 22px;
+    z-index: 7;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--blue);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .hint {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 7;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--blue);
+    opacity: 0.55;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  .progress {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 1px;
+    width: 0;
+    z-index: 9;
+    background: var(--blue);
+    box-shadow: 0 0 12px rgba(143, 217, 251, 0.7);
+  }
+
+  @media (max-width: 760px) {
+    .boot {
+      display: none;
+    }
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    color: var(--blue);
+    opacity: 0.72;
+    margin-bottom: 24px;
+  }
+
+  .lede {
+    font-size: clamp(15px, 1.75vw, 22px);
+    font-weight: 300;
+    color: #a9bccb;
+    max-width: 30ch;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  .body-copy {
+    font-size: clamp(13.5px, 1.25vw, 16px);
+    font-weight: 300;
+    color: #93a6b6;
+    max-width: 46ch;
+    line-height: 1.85;
+  }
+
+  .section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(72px, 13vh, 128px) clamp(24px, 7vw, 132px);
+    max-width: 1440px;
+  }
+
+  .panel {
+    border: 1px solid var(--line);
+    margin-top: 38px;
+    max-width: 660px;
+    background: rgba(10, 18, 26, 0.5);
+    backdrop-filter: blur(6px);
+  }
+
+  .panel-hdr {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--blue);
+    opacity: 0.8;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .panel-rows {
+    padding: 8px 24px 20px;
+  }
+
+  .row {
+    display: flex;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(143, 217, 251, 0.07);
+    font-size: 14px;
+    font-weight: 300;
+    color: #9db0c0;
+    line-height: 1.6;
+  }
+
+  .row:last-child {
+    border-bottom: 0;
+  }
+
+  .row-k {
+    font-size: 11px;
+    color: var(--blue);
+    opacity: 0.7;
+    flex: 0 0 78px;
+    padding-top: 3px;
+    letter-spacing: 0.08em;
+  }
+
+  .cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 42px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    border-radius: 2px;
+    border: 1px solid rgba(143, 217, 251, 0.3);
+    color: var(--ink);
+    background: rgba(143, 217, 251, 0.04);
+    transition: all 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .btn:hover {
+    background: rgba(143, 217, 251, 0.11);
+    border-color: var(--blue);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #04141d;
+    border-color: var(--blue);
+    font-weight: 500;
+  }
+
+  .btn-primary:hover {
+    background: #a9e3fc;
+    box-shadow: 0 10px 40px rgba(143, 217, 251, 0.22);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: 0.86em;
+    background: var(--blue);
+    vertical-align: -0.06em;
+    margin-left: 0.18em;
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .lede {
+      max-width: none;
+    }
+  }
+}
+
+/* lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
