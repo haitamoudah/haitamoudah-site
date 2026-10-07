@@ -38,7 +38,7 @@ export const site = {
   hero: {
     eyebrow: "software developer",
     heading: ["haitam", "oudah"],
-    lede: "i work across web and native. i like problems that end with something people can actually download.",
+    lede: "i work full time as a developer, and i make time for work that's worth it: products, side collaborations, open source.",
   },
 
   approach: {
