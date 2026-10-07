@@ -312,6 +312,16 @@
       max-width: none;
     }
   }
+
+  /* the widest panel header runs out of room on the narrowest phones: both
+     spans wrap and the header doubles in height. stack them instead, so every
+     panel keeps one line per span. above this the reference layout fits. */
+  @media (max-width: 380px) {
+    .panel-hdr {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
 }
 
 /* lenis smooth scroll */

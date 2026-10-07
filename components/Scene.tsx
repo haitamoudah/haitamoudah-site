@@ -14,11 +14,14 @@ const HORIZON_BLUE = 0xbde8ff;
 const SP = 70;
 const Z_NEAR = 700;
 
-/* panels arrive roughly as each content section enters view */
+/* panels arrive roughly as each content section enters view, evenly spaced
+   from the first body section to just short of TOTAL_TRAVEL. one per body
+   section: respace these whenever a section is added or removed. */
 const PANELS = [
-  { at: 820, w: 300, h: 190, x: -140 },
-  { at: 1750, w: 340, h: 210, x: 0 },
-  { at: 2680, w: 300, h: 190, x: 150 },
+  { at: 1055, w: 300, h: 190, x: -140 },
+  { at: 2022, w: 340, h: 210, x: 0 },
+  { at: 2989, w: 300, h: 190, x: 150 },
+  { at: 3956, w: 320, h: 200, x: -120 },
 ];
 
 function lineGeometry(points: number[]) {

@@ -2,7 +2,7 @@
    the ticker writes, the scene reads. plain mutable object, no react state:
    these values change every frame. */
 
-export const TOTAL_TRAVEL = 3400;
+export const TOTAL_TRAVEL = 4375;
 export const IDLE_DRIFT = 11;
 export const DAMP = 0.07;
 

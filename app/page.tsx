@@ -79,6 +79,25 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="work-2" className="section">
+        <p className="eyebrow" data-reveal="">
+          {site.work2.eyebrow}
+        </p>
+        <Heading as="h2" lines={site.work2.heading} reveal />
+        {site.work2.paragraphs.map((text, i) => (
+          <p
+            key={text.slice(0, 24)}
+            className={i > 0 ? "body-copy mt-5" : "body-copy"}
+            data-reveal=""
+          >
+            {text}
+          </p>
+        ))}
+        <div data-reveal="">
+          <SpecPanel panel={site.work2.panel} />
+        </div>
+      </section>
+
       <section id="contact" className="section">
         <p className="eyebrow" data-reveal="">
           {site.contact.eyebrow}
